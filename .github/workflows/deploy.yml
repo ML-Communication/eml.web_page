@@ -1,10 +1,10 @@
-name: Test CloudFront Access
+name: Debug CloudFront Access
 
 on:
   workflow_dispatch:
 
 jobs:
-  test-cloudfront:
+  debug-cloudfront:
     runs-on: ubuntu-latest
     
     steps:
@@ -18,18 +18,21 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    - name: Test CloudFront distribution exists
+    - name: Debug - Show CloudFront Distribution ID
       run: |
-        echo "Testing CloudFront distribution..."
-        aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        echo "CloudFront Distribution ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
         
-    - name: Test CloudFront invalidation
+    - name: Debug - List all CloudFront distributions
       run: |
-        echo "Testing CloudFront invalidation..."
-        aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/test-file.txt"
+        echo "Listing all CloudFront distributions..."
+        aws cloudfront list-distributions --region us-east-1 --output table
         
-    - name: CloudFront test complete
+    - name: Debug - Try to get specific distribution
       run: |
-        echo "✅ CloudFront access test successful!"
+        echo "Trying to get distribution details..."
+        aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --region us-east-1 || echo "Failed to get distribution"
+        
+    - name: Debug - Test with different region approach
+      run: |
+        echo "Testing CloudFront without explicit region..."
+        aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} || echo "Failed without region"
