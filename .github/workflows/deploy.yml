@@ -1,24 +1,18 @@
-name: Test AWS Connection
+name: Test S3 Access
 
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
-  test:
+  test-s3:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
       
-    - name: Show environment
-      run: |
-        echo "Runner OS: $RUNNER_OS"
-        echo "AWS CLI version:"
-        aws --version
-        
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v5
       with:
@@ -26,16 +20,27 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    - name: Test AWS identity
+    - name: Test S3 bucket exists
       run: |
-        echo "Testing AWS identity..."
-        aws sts get-caller-identity
+        echo "Testing if S3 bucket exists..."
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}
         
-    - name: Test S3 list buckets
+    - name: Test S3 upload (single file)
       run: |
-        echo "Testing S3 access..."
-        aws s3 ls
+        echo "Testing S3 upload..."
+        echo "Test deployment $(date)" > test-file.txt
+        aws s3 cp test-file.txt s3://${{ secrets.S3_BUCKET_NAME }}/test-file.txt
         
-    - name: Success
+    - name: Test S3 list uploaded file
       run: |
-        echo "✅ AWS connection successful!"
+        echo "Verifying file was uploaded..."
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/test-file.txt
+        
+    - name: Clean up test file
+      run: |
+        echo "Cleaning up test file..."
+        aws s3 rm s3://${{ secrets.S3_BUCKET_NAME }}/test-file.txt
+        
+    - name: S3 test complete
+      run: |
+        echo "✅ S3 access test successful!"
