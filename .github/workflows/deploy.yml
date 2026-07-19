@@ -1,4 +1,4 @@
-name: Deploy to S3 and CloudFront
+name: Debug Deploy to S3 and CloudFront
 
 on:
   push:
@@ -10,58 +10,41 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5  # Updated version
+      uses: actions/checkout@v5
       
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v5  # Updated version
+      uses: aws-actions/configure-aws-credentials@v5
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    - name: Test AWS connection
+    - name: Debug - Check AWS CLI version
       run: |
-        echo "Testing AWS connection..."
+        aws --version
+        
+    - name: Debug - Test AWS connection
+      run: |
+        echo "Testing AWS STS (Security Token Service)..."
         aws sts get-caller-identity
         
-    - name: List S3 bucket (test permissions)
+    - name: Debug - Check secrets
       run: |
-        echo "Testing S3 access..."
-        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} || echo "Bucket listing failed, but continuing..."
+        echo "AWS Region: ${{ secrets.AWS_REGION }}"
+        echo "S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
+        echo "CloudFront Distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
         
-    - name: Sync files to S3
+    - name: Debug - Test S3 access
       run: |
-        echo "Syncing files to S3..."
-        aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
-          --delete \
-          --exclude ".git/*" \
-          --exclude ".github/*" \
-          --exclude "README.md" \
-          --exclude "*.md" \
-          --exclude ".gitignore" \
-          --exclude "node_modules/*" \
-          --dryrun
-          
-    - name: Actual sync to S3 (remove --dryrun after testing)
-      run: |
-        echo "Performing actual sync..."
-        aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
-          --delete \
-          --exclude ".git/*" \
-          --exclude ".github/*" \
-          --exclude "README.md" \
-          --exclude "*.md" \
-          --exclude ".gitignore" \
-          --exclude "node_modules/*"
-          
-    - name: Invalidate CloudFront cache
-      run: |
-        echo "Invalidating CloudFront cache..."
-        aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/*"
+        echo "Testing S3 bucket access..."
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --region ${{ secrets.AWS_REGION }}
         
-    - name: Deployment complete
+    - name: Debug - Test CloudFront access
       run: |
-        echo "✅ Deployment successful!"
-        echo "🌐 Website: https://www.easymusiclearning.com"
+        echo "Testing CloudFront access..."
+        aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        
+    - name: Debug - List files to sync
+      run: |
+        echo "Files that would be synced:"
+        find . -type f ! -path "./.git/*" ! -path "./.github/*" ! -name "README.md" ! -name "*.md" ! -name ".gitignore"
