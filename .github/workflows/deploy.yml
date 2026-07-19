@@ -1,17 +1,24 @@
-name: Debug Deploy to S3 and CloudFront
+name: Test AWS Connection
 
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
       
+    - name: Show environment
+      run: |
+        echo "Runner OS: $RUNNER_OS"
+        echo "AWS CLI version:"
+        aws --version
+        
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v5
       with:
@@ -19,32 +26,16 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    - name: Debug - Check AWS CLI version
+    - name: Test AWS identity
       run: |
-        aws --version
-        
-    - name: Debug - Test AWS connection
-      run: |
-        echo "Testing AWS STS (Security Token Service)..."
+        echo "Testing AWS identity..."
         aws sts get-caller-identity
         
-    - name: Debug - Check secrets
+    - name: Test S3 list buckets
       run: |
-        echo "AWS Region: ${{ secrets.AWS_REGION }}"
-        echo "S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
-        echo "CloudFront Distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+        echo "Testing S3 access..."
+        aws s3 ls
         
-    - name: Debug - Test S3 access
+    - name: Success
       run: |
-        echo "Testing S3 bucket access..."
-        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --region ${{ secrets.AWS_REGION }}
-        
-    - name: Debug - Test CloudFront access
-      run: |
-        echo "Testing CloudFront access..."
-        aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-        
-    - name: Debug - List files to sync
-      run: |
-        echo "Files that would be synced:"
-        find . -type f ! -path "./.git/*" ! -path "./.github/*" ! -name "README.md" ! -name "*.md" ! -name ".gitignore"
+        echo "✅ AWS connection successful!"
