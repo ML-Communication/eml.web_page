@@ -10,27 +10,53 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5  # Updated version
       
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5  # Updated version
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
+    - name: Test AWS connection
+      run: |
+        echo "Testing AWS connection..."
+        aws sts get-caller-identity
+        
+    - name: List S3 bucket (test permissions)
+      run: |
+        echo "Testing S3 access..."
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} || echo "Bucket listing failed, but continuing..."
+        
     - name: Sync files to S3
       run: |
+        echo "Syncing files to S3..."
         aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
           --delete \
           --exclude ".git/*" \
           --exclude ".github/*" \
           --exclude "README.md" \
           --exclude "*.md" \
-          --exclude ".gitignore"
+          --exclude ".gitignore" \
+          --exclude "node_modules/*" \
+          --dryrun
+          
+    - name: Actual sync to S3 (remove --dryrun after testing)
+      run: |
+        echo "Performing actual sync..."
+        aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
+          --delete \
+          --exclude ".git/*" \
+          --exclude ".github/*" \
+          --exclude "README.md" \
+          --exclude "*.md" \
+          --exclude ".gitignore" \
+          --exclude "node_modules/*"
           
     - name: Invalidate CloudFront cache
       run: |
+        echo "Invalidating CloudFront cache..."
         aws cloudfront create-invalidation \
           --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
           --paths "/*"
