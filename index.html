@@ -25,86 +25,91 @@
       <nav class="container nav">
         <a href="#top" class="brand">Easy Music Learning</a>
         <div class="nav-links">
-          <a href="#about">About</a>
-          <a href="#programs">Programs</a>
-          <a href="#benefits">Why Us</a>
+          <a href="#game">Play</a>
+          <a href="#levels">Levels</a>
           <a href="#contact">Contact</a>
         </div>
       </nav>
 
       <div class="container hero-grid" id="top">
         <div class="hero-copy">
-          <p class="eyebrow">Music made simple and joyful</p>
-          <h1>Fun piano lessons for children who are just beginning.</h1>
+          <p class="eyebrow">Music learning game</p>
+          <h1>Play, listen, and learn piano one note at a time.</h1>
           <p>
-            At Easy Music Learning, we help young learners build confidence, rhythm,
-            and creativity through warm and encouraging lessons.
+            Welcome to Easy Music Learning, where young players can explore rhythm,
+            notes, and fun challenges in a game-style learning adventure.
           </p>
           <ul class="hero-highlights">
-            <li>Gentle, patient teaching for beginners</li>
-            <li>Lessons designed for children and parents</li>
-            <li>Fun progress from the first lesson</li>
+            <li>Tap the right note to score points</li>
+            <li>Unlock beginner piano levels</li>
+            <li>Build confidence through playful practice</li>
           </ul>
         </div>
 
         <aside class="hero-panel">
-          <p class="panel-badge">Why families choose us</p>
-          <h3>Learning that feels joyful</h3>
-          <ul>
-            <li>Friendly lessons that build confidence step by step</li>
-            <li>Simple activities that make music feel fun</li>
-            <li>Support for both children and parents at home</li>
-          </ul>
-          <p class="panel-footer">Warm guidance • Clear progress • Happy beginners</p>
+          <p class="panel-badge">Today’s mission</p>
+          <h3>Find the matching note</h3>
+          <div class="game-preview">
+            <span class="note bounce">C</span>
+            <span class="note bounce">D</span>
+            <span class="note bounce">E</span>
+          </div>
+          <div class="progress-box">
+            <div class="progress-label">Progress</div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <p class="panel-footer">Playful practice • Friendly feedback • New levels unlocked</p>
         </aside>
       </div>
     </header>
 
     <main>
-      <section class="section container" id="about">
-        <p class="eyebrow">About us</p>
-        <h2>A friendly first step into music</h2>
-        <p>
-          We believe every child can enjoy piano when lessons are playful,
-          structured, and full of encouragement. Our approach helps young learners
-          feel successful from the very first note.
-        </p>
-      </section>
-
-      <section class="section alt" id="programs">
-        <div class="container">
-          <p class="eyebrow">Programs</p>
-          <h2>Lessons designed for young beginners</h2>
-          <div class="card-grid">
-            <article class="card">
-              <h3>Beginner Piano</h3>
-              <p>Introduce rhythm, simple note reading, and first songs in a fun way.</p>
-            </article>
-            <article class="card">
-              <h3>Creative Music Time</h3>
-              <p>Build listening skills and confidence through playful activities.</p>
-            </article>
-            <article class="card">
-              <h3>Confidence Boost</h3>
-              <p>Support steady progress with short, encouraging lessons and regular wins.</p>
-            </article>
+      <section class="section container" id="game">
+        <p class="eyebrow">Game mode</p>
+        <h2>Try the music learning challenge</h2>
+        <div class="game-board">
+          <div class="game-card">
+            <h3>Note Quest</h3>
+            <p>Choose the correct note name for the sound you hear.</p>
+            <div class="answer-row">
+              <button class="answer-btn">C</button>
+              <button class="answer-btn">D</button>
+              <button class="answer-btn">E</button>
+            </div>
+            <div class="feedback" id="feedback-note">Tap a note to see your result!</div>
+          </div>
+          <div class="game-card accent-card">
+            <h3>Rhythm Rally</h3>
+            <p>Tap along to a simple beat and build your rhythm skills.</p>
+            <div class="beat-row">
+              <button class="beat-btn">♪</button>
+              <button class="beat-btn">♪</button>
+              <button class="beat-btn">♪</button>
+            </div>
+            <div class="feedback" id="feedback-rhythm">Keep the beat going!</div>
           </div>
         </div>
       </section>
 
-      <section class="section container" id="benefits">
-        <p class="eyebrow">Why choose us</p>
-        <div class="split-grid">
-          <div>
-            <h2>Building confidence through music</h2>
-            <p>
-              Our lessons move at a comfortable pace and celebrate every milestone,
-              so children feel supported while they learn.
-            </p>
-          </div>
-          <div class="quote-card">
-            <p>“Every lesson is designed to feel clear, warm, and encouraging.”</p>
-            <strong>— Easy Music Learning</strong>
+      <section class="section alt" id="levels">
+        <div class="container">
+          <p class="eyebrow">Levels</p>
+          <h2>Grow from beginner to confident player</h2>
+          <div class="card-grid">
+            <article class="card">
+              <h3>Level 1: First Notes</h3>
+              <p>Learn simple notes and match them to the keyboard.</p>
+            </article>
+            <article class="card">
+              <h3>Level 2: Beat Builder</h3>
+              <p>Practice steady rhythm with fun tapping challenges.</p>
+            </article>
+            <article class="card">
+              <h3>Level 3: Mini Melody</h3>
+              <p>Put together short melodies and celebrate every win.</p>
+            </article>
           </div>
         </div>
       </section>
@@ -113,8 +118,8 @@
         <div class="container cta-box">
           <div>
             <p class="eyebrow">Contact</p>
-            <h2>Let’s help your child begin their musical journey.</h2>
-            <p>We are still building this site and will share updates soon. Please check back for new information.</p>
+            <h2>This experience is still growing.</h2>
+            <p>We are building a fun learning game and will share more exciting updates soon.</p>
           </div>
         </div>
       </section>
