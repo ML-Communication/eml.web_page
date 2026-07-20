@@ -1,132 +1,923 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Easy Music Learning | Piano Lessons for Children</title>
-    <meta
-      name="description"
-      content="Easy Music Learning offers joyful piano lessons for children, helping them build confidence, rhythm, and creativity."
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="beta-banner" role="status" aria-label="Site under construction">
-      <div class="container beta-banner__content">
-        <span class="beta-pill">Beta</span>
-        <div class="beta-banner__text">
-          <strong>Coming Soon</strong>
-          <span>This website is still under construction. Please check back soon for updates.</span>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Music Learning - Play & Learn Music!</title>
+    <!-- Tailwind CSS for modern responsive utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for kids/music iconography -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Fredoka for a friendly, rounded, playful appearance -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tone.js for accurate web audio synthesis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Canvas confetti for celebration effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #f472b6 100%);
+            touch-action: manipulation;
+        }
+        
+        .piano-white-key {
+            height: 180px;
+            box-shadow: 0 4px 0px #d1d5db, 0 8px 15px rgba(0,0,0,0.1);
+            transition: all 0.05s ease;
+        }
+        
+        .piano-white-key:active, .piano-white-key.active {
+            height: 175px;
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #d1d5db, 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .piano-black-key {
+            height: 110px;
+            box-shadow: 0 3px 0px #000, 0 6px 10px rgba(0,0,0,0.15);
+            transition: all 0.05s ease;
+            z-index: 10;
+        }
+        
+        .piano-black-key:active, .piano-black-key.active {
+            height: 106px;
+            transform: translateY(3px);
+            box-shadow: 0 0px 0px #000, 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Animated cute background bubbles */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            animation: float-up 12s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(110vh) scale(0.3) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden relative pb-12 flex flex-col items-center">
+
+    <!-- Ambient background bubbles -->
+    <div class="bubble w-12 h-12 left-10" style="animation-delay: 0s;"></div>
+    <div class="bubble w-20 h-20 left-1/4" style="animation-delay: 3s;"></div>
+    <div class="bubble w-16 h-16 left-1/2" style="animation-delay: 1.5s;"></div>
+    <div class="bubble w-24 h-24 left-3/4" style="animation-delay: 5s;"></div>
+    <div class="bubble w-10 h-10 left-[90%]" style="animation-delay: 4.2s;"></div>
+
+    <!-- Welcome Sound Start Overlay -->
+    <div id="start-overlay" class="fixed inset-0 bg-indigo-900/90 z-50 flex flex-col items-center justify-center p-6 text-center transition-all duration-500">
+        <div class="bg-white p-8 rounded-3xl max-w-md shadow-2xl border-4 border-yellow-400 transform scale-100 transition-transform duration-300">
+            <div class="text-6xl mb-4 animate-bounce">🎶</div>
+            <h1 class="text-4xl font-bold text-indigo-900 mb-2">Easy Music Learning</h1>
+            <p class="text-lg text-indigo-700 mb-6 font-medium">Ready to play games and learn how music works? Tap the button to turn on the magic! ✨</p>
+            <button id="start-audio-btn" class="w-full bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white text-2xl font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Let's Play!
+            </button>
         </div>
-      </div>
     </div>
 
-    <header class="hero">
-      <nav class="container nav">
-        <a href="#top" class="brand">Easy Music Learning</a>
-        <div class="nav-links">
-          <a href="#game">Play</a>
-          <a href="#levels">Levels</a>
-          <a href="#contact">Contact</a>
-        </div>
-      </nav>
-
-      <div class="container hero-grid" id="top">
-        <div class="hero-copy">
-          <p class="eyebrow">Music learning game</p>
-          <h1>Play, listen, and learn piano one note at a time.</h1>
-          <p>
-            Welcome to Easy Music Learning, where young players can explore rhythm,
-            notes, and fun challenges in a game-style learning adventure.
-          </p>
-          <ul class="hero-highlights">
-            <li>Tap the right note to score points</li>
-            <li>Unlock beginner piano levels</li>
-            <li>Build confidence through playful practice</li>
-          </ul>
-        </div>
-
-        <aside class="hero-panel">
-          <p class="panel-badge">Today’s mission</p>
-          <h3>Find the matching note</h3>
-          <div class="game-preview">
-            <span class="note bounce">C</span>
-            <span class="note bounce">D</span>
-            <span class="note bounce">E</span>
-          </div>
-          <div class="progress-box">
-            <div class="progress-label">Progress</div>
-            <div class="progress-bar">
-              <div class="progress-fill"></div>
+    <!-- Main Game Container -->
+    <div class="relative w-full max-w-5xl px-4 z-10">
+        
+        <!-- Header & Mascot HUD -->
+        <header class="flex flex-col md:flex-row items-center justify-between py-6 mt-2 mb-4 bg-white/45 backdrop-blur-md rounded-3xl p-6 shadow-md border border-white/50 gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-tr from-yellow-400 to-pink-500 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-md text-white animate-pulse">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-extrabold text-indigo-900 drop-shadow-sm">Easy Music Learning</h2>
+                    <p class="text-sm font-semibold text-pink-800">Learn Notes, Melodies, & Rhythm!</p>
+                </div>
             </div>
-          </div>
-          <p class="panel-footer">Playful practice • Friendly feedback • New levels unlocked</p>
-        </aside>
-      </div>
-    </header>
 
-    <main>
-      <section class="section container" id="game">
-        <p class="eyebrow">Game mode</p>
-        <h2>Try the music learning challenge</h2>
-        <div class="game-board">
-          <div class="game-card">
-            <h3>Note Quest</h3>
-            <p>Choose the correct note name for the sound you hear.</p>
-            <div class="answer-row">
-              <button class="answer-btn">C</button>
-              <button class="answer-btn">D</button>
-              <button class="answer-btn">E</button>
+            <!-- Score & Level Tracker -->
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-600 text-white py-2 px-5 rounded-2xl flex items-center gap-2 shadow-inner">
+                    <span class="text-xs uppercase tracking-wide opacity-85">Points</span>
+                    <span id="score-display" class="text-2xl font-black">0</span>
+                </div>
+                <div class="bg-yellow-400 text-indigo-950 py-2 px-5 rounded-2xl flex items-center gap-2 shadow-inner font-bold">
+                    <span class="text-xs uppercase tracking-wide opacity-85">Level</span>
+                    <span id="level-display" class="text-2xl font-black">1</span>
+                </div>
+                <button id="help-btn" class="bg-white hover:bg-indigo-50 text-indigo-900 w-12 h-12 rounded-2xl flex items-center justify-center border-2 border-indigo-200 shadow-sm transition transform active:scale-90" title="How to Play">
+                    <i class="fa-solid fa-question text-xl"></i>
+                </button>
             </div>
-            <div class="feedback" id="feedback-note">Tap a note to see your result!</div>
-          </div>
-          <div class="game-card accent-card">
-            <h3>Rhythm Rally</h3>
-            <p>Tap along to a simple beat and build your rhythm skills.</p>
-            <div class="beat-row">
-              <button class="beat-btn">♪</button>
-              <button class="beat-btn">♪</button>
-              <button class="beat-btn">♪</button>
+        </header>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="hidden fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-6 max-w-lg w-full border-4 border-indigo-400 shadow-2xl relative">
+                <button id="close-help-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+                <h3 class="text-2xl font-bold text-indigo-900 mb-4"><i class="fa-solid fa-star text-yellow-400"></i> How to Play!</h3>
+                <div class="space-y-3 text-indigo-800 text-sm md:text-base">
+                    <p>🎹 <strong>Piano Quest:</strong> Play the keys freely or switch to <strong>Game Mode</strong>. Copy the notes on the magical staff or repeat the songs played by our companion!</p>
+                    <p>🥁 <strong>Beat Builder:</strong> Toggle circles on the grid to create custom repeating rhythms. Change the tempo slider to speed up or slow down the beat.</p>
+                    <p>🔊 <strong>Learn Timbre:</strong> Change the wave sliders to hear how retro square waves sound different from soft triangle waves!</p>
+                </div>
             </div>
-            <div class="feedback" id="feedback-rhythm">Keep the beat going!</div>
-          </div>
         </div>
-      </section>
 
-      <section class="section alt" id="levels">
-        <div class="container">
-          <p class="eyebrow">Levels</p>
-          <h2>Grow from beginner to confident player</h2>
-          <div class="card-grid">
-            <article class="card">
-              <h3>Level 1: First Notes</h3>
-              <p>Learn simple notes and match them to the keyboard.</p>
-            </article>
-            <article class="card">
-              <h3>Level 2: Beat Builder</h3>
-              <p>Practice steady rhythm with fun tapping challenges.</p>
-            </article>
-            <article class="card">
-              <h3>Level 3: Mini Melody</h3>
-              <p>Put together short melodies and celebrate every win.</p>
-            </article>
-          </div>
+        <!-- Mode Selectors -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button id="tab-piano" class="py-4 px-6 rounded-2xl text-lg font-bold shadow-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 bg-white text-indigo-900 border-b-4 border-indigo-200 hover:bg-indigo-50 [&.active]:bg-indigo-600 [&.active]:text-white [&.active]:border-indigo-800 active">
+                <i class="fa-solid fa-keyboard"></i> Piano Quest
+            </button>
+            <button id="tab-sequencer" class="py-4 px-6 rounded-2xl text-lg font-bold shadow-md transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 bg-white text-indigo-900 border-b-4 border-indigo-200 hover:bg-indigo-50 [&.active]:bg-indigo-600 [&.active]:text-white [&.active]:border-indigo-800">
+                <i class="fa-solid fa-drum"></i> Beat Builder
+            </button>
         </div>
-      </section>
 
-      <section class="section cta-section" id="contact">
-        <div class="container cta-box">
-          <div>
-            <p class="eyebrow">Contact</p>
-            <h2>This experience is still growing.</h2>
-            <p>We are building a fun learning game and will share more exciting updates soon.</p>
-          </div>
-        </div>
-      </section>
-    </main>
+        <!-- Piano Quest Section -->
+        <section id="section-piano" class="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-lg border border-white/60 mb-6 flex flex-col gap-6">
+            
+            <!-- Helper Dialogue Box -->
+            <div class="flex items-start gap-4 bg-indigo-50 border-2 border-indigo-100 rounded-2xl p-4 relative overflow-hidden">
+                <div class="text-4xl animate-bounce">🐹</div>
+                <div class="flex-1">
+                    <p id="buddy-speech" class="text-indigo-900 font-medium">Hello! I'm Maestro Hammy. Welcome to your music playground. Try pressing the piano keys to hear notes, or activate <strong>Game Mode</strong> below!</p>
+                </div>
+                <div class="absolute right-2 bottom-0 text-indigo-200/50 text-5xl font-black">?</div>
+            </div>
 
-    <footer class="footer">
-      <div class="container">© 2026 Easy Music Learning. All rights reserved.</div>
-    </footer>
-  </body>
+            <!-- Visual Music Staff Board -->
+            <div class="bg-slate-900 rounded-2xl p-4 flex flex-col items-center justify-center relative shadow-inner overflow-hidden border-2 border-slate-700 min-h-[140px]">
+                <span class="absolute top-2 left-4 text-xs text-slate-400 tracking-widest font-semibold uppercase">The Musical Staff</span>
+                
+                <!-- Staff Canvas / Visuals -->
+                <div class="w-full max-w-md relative flex flex-col justify-between py-6 h-28 mt-4">
+                    <!-- Staff lines (5 lines) -->
+                    <div class="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none">
+                        <div class="border-t border-slate-700 w-full"></div>
+                        <div class="border-t border-slate-700 w-full"></div>
+                        <div class="border-t border-slate-700 w-full"></div>
+                        <div class="border-t border-slate-700 w-full"></div>
+                        <div class="border-t border-slate-700 w-full"></div>
+                    </div>
+                    
+                    <!-- Clef and active notes overlay -->
+                    <div class="absolute inset-y-0 left-2 flex items-center text-4xl text-yellow-400 font-bold select-none pointer-events-none">
+                        𝄞
+                    </div>
+
+                    <!-- Staff Dynamic Note Display -->
+                    <div id="staff-note-container" class="absolute inset-0 relative">
+                        <!-- Dynamic active notes go here via JS -->
+                    </div>
+                </div>
+
+                <!-- Current Note Label Bubble -->
+                <div id="staff-active-label" class="mt-2 bg-yellow-400 text-slate-950 font-black px-4 py-1 rounded-full text-sm animate-pulse opacity-0">
+                    C4
+                </div>
+            </div>
+
+            <!-- Game Control Panel (Sub-modes for piano) -->
+            <div class="flex flex-wrap items-center justify-between gap-4 py-2 border-b-2 border-indigo-50">
+                <div class="flex items-center gap-2">
+                    <button id="piano-mode-free" class="px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition active:scale-95 border-b-2 border-indigo-800">
+                        <i class="fa-solid fa-smile-wink"></i> Free Play
+                    </button>
+                    <button id="piano-mode-game" class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 text-indigo-900 hover:bg-indigo-200 transition active:scale-95">
+                        <i class="fa-solid fa-gamepad"></i> Note Match Quest
+                    </button>
+                    <button id="piano-mode-simon" class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 text-indigo-900 hover:bg-indigo-200 transition active:scale-95">
+                        <i class="fa-solid fa-brain"></i> Memory Melodies
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Synthesizer wave options (Timbre learning) -->
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wide">Sound Shape:</label>
+                    <select id="synth-waveform" class="bg-indigo-50 border border-indigo-200 text-indigo-900 py-1 px-3 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        <option value="sine">🎵 Smooth (Sine)</option>
+                        <option value="triangle">🎷 Soft Flute (Triangle)</option>
+                        <option value="square">👾 Retro Game (Square)</option>
+                        <option value="sawtooth">🎻 Bright Brass (Sawtooth)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Interactive Piano Keyboard -->
+            <div class="relative flex justify-center py-4 overflow-x-auto min-h-[220px]">
+                <div class="flex relative rounded-2xl overflow-hidden shadow-md max-w-full">
+                    
+                    <!-- White Keys -->
+                    <button data-note="C4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🍎</span>
+                        <span class="text-sm text-indigo-900 font-bold">C</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Apple</span>
+                    </button>
+
+                    <button data-note="D4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🦆</span>
+                        <span class="text-sm text-indigo-900 font-bold">D</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Duck</span>
+                    </button>
+
+                    <button data-note="E4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🥚</span>
+                        <span class="text-sm text-indigo-900 font-bold">E</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Egg</span>
+                    </button>
+
+                    <button data-note="F4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🦊</span>
+                        <span class="text-sm text-indigo-900 font-bold">F</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Fox</span>
+                    </button>
+
+                    <button data-note="G4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🍇</span>
+                        <span class="text-sm text-indigo-900 font-bold">G</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Grape</span>
+                    </button>
+
+                    <button data-note="A4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🐜</span>
+                        <span class="text-sm text-indigo-900 font-bold">A</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Ant</span>
+                    </button>
+
+                    <button data-note="B4" class="piano-white-key w-12 sm:w-16 bg-white border-r border-slate-200 rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🐝</span>
+                        <span class="text-sm text-indigo-900 font-bold">B</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Bee</span>
+                    </button>
+
+                    <button data-note="C5" class="piano-white-key w-12 sm:w-16 bg-white rounded-b-xl flex flex-col justify-end pb-4 items-center focus:outline-none relative group">
+                        <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">🐱</span>
+                        <span class="text-sm text-indigo-900 font-bold">C5</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Cat</span>
+                    </button>
+
+                    <!-- Black Keys Absolute Overlay position markers -->
+                    <!-- C#4 -->
+                    <button data-note="C#4" class="piano-black-key absolute w-7 sm:w-9 bg-slate-900 text-white rounded-b-lg flex flex-col justify-end pb-2 items-center focus:outline-none text-[9px] font-bold" style="left: calc(12.5% - 14px); @media(min-width: 640px) { left: calc(12.5% - 18px); }">
+                        <span>C#</span>
+                    </button>
+                    <!-- D#4 -->
+                    <button data-note="D#4" class="piano-black-key absolute w-7 sm:w-9 bg-slate-900 text-white rounded-b-lg flex flex-col justify-end pb-2 items-center focus:outline-none text-[9px] font-bold" style="left: calc(25% - 14px);">
+                        <span>D#</span>
+                    </button>
+                    <!-- F#4 -->
+                    <button data-note="F#4" class="piano-black-key absolute w-7 sm:w-9 bg-slate-900 text-white rounded-b-lg flex flex-col justify-end pb-2 items-center focus:outline-none text-[9px] font-bold" style="left: calc(50% - 14px);">
+                        <span>F#</span>
+                    </button>
+                    <!-- G#4 -->
+                    <button data-note="G#4" class="piano-black-key absolute w-7 sm:w-9 bg-slate-900 text-white rounded-b-lg flex flex-col justify-end pb-2 items-center focus:outline-none text-[9px] font-bold" style="left: calc(62.5% - 14px);">
+                        <span>G#</span>
+                    </button>
+                    <!-- A#4 -->
+                    <button data-note="A#4" class="piano-black-key absolute w-7 sm:w-9 bg-slate-900 text-white rounded-b-lg flex flex-col justify-end pb-2 items-center focus:outline-none text-[9px] font-bold" style="left: calc(75% - 14px);">
+                        <span>A#</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Hint overlay for Simon Says/Game Status -->
+            <div id="game-status-bar" class="hidden text-center py-2 bg-yellow-100 rounded-xl font-bold text-yellow-800 animate-pulse">
+                Game loading...
+            </div>
+
+        </section>
+
+        <!-- Beat Builder Sequencer Section -->
+        <section id="section-sequencer" class="hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-lg border border-white/60 mb-6 flex flex-col gap-6">
+            
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-indigo-100">
+                <div>
+                    <h3 class="text-2xl font-bold text-indigo-900">Beat Builder Grid</h3>
+                    <p class="text-sm text-slate-500">Tap cells to make a cool rhythmic drum loop!</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button id="seq-play-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-extrabold text-lg flex items-center gap-2 shadow transition-all active:scale-95">
+                        <i class="fa-solid fa-circle-play"></i> Play Loop
+                    </button>
+                    <button id="seq-clear-btn" class="bg-slate-200 hover:bg-slate-300 text-indigo-900 px-4 py-3 rounded-2xl font-bold transition active:scale-95">
+                        <i class="fa-solid fa-trash-can"></i> Clear Grid
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sequencer Parameters -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-2xl">
+                <!-- Tempo Slider -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-sm font-bold text-slate-700">
+                        <span>🐢 Slow (Adagio)</span>
+                        <span class="bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-xs" id="tempo-val">120 BPM</span>
+                        <span>🐇 Fast (Presto)</span>
+                    </div>
+                    <input type="range" id="seq-tempo" min="60" max="200" value="120" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                </div>
+
+                <!-- Timbre preset controller -->
+                <div class="flex flex-col gap-2 justify-center">
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Sound Presets:</span>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="synth-preset-btn active px-3 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm border-b-2 border-indigo-800" data-preset="space">
+                            🚀 Space Toy
+                        </button>
+                        <button class="synth-preset-btn px-3 py-2 rounded-xl text-xs font-bold bg-white text-indigo-900 hover:bg-indigo-50 border border-indigo-200" data-preset="retro">
+                            👾 8-Bit Retro
+                        </button>
+                        <button class="synth-preset-btn px-3 py-2 rounded-xl text-xs font-bold bg-white text-indigo-900 hover:bg-indigo-50 border border-indigo-200" data-preset="dreamy">
+                            ✨ Dream Bell
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sequencer Grid -->
+            <div class="overflow-x-auto">
+                <div class="min-w-[600px] flex flex-col gap-3">
+                    
+                    <!-- Sound Row 1: Low Percussion (Base Drum) -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-28 flex items-center gap-2 font-bold text-slate-800">
+                            <span class="text-2xl">🥁</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm leading-tight">Low Drum</span>
+                                <span class="text-[10px] text-slate-400">Boom</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 grid grid-cols-8 gap-2" id="grid-row-low">
+                            <!-- JS will spawn sequence cells here -->
+                        </div>
+                    </div>
+
+                    <!-- Sound Row 2: High Percussion (Chirp/Beep) -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-28 flex items-center gap-2 font-bold text-slate-800">
+                            <span class="text-2xl">🔔</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm leading-tight">Chime</span>
+                                <span class="text-[10px] text-slate-400">Ting</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 grid grid-cols-8 gap-2" id="grid-row-mid">
+                            <!-- JS will spawn sequence cells here -->
+                        </div>
+                    </div>
+
+                    <!-- Sound Row 3: High Pitch Chime (Synth Chord Beep) -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-28 flex items-center gap-2 font-bold text-slate-800">
+                            <span class="text-2xl">👽</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm leading-tight">Blip Synth</span>
+                                <span class="text-[10px] text-slate-400">Swoosh</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 grid grid-cols-8 gap-2" id="grid-row-high">
+                            <!-- JS will spawn sequence cells here -->
+                        </div>
+                    </div>
+
+                    <!-- Beat counter indicator bar -->
+                    <div class="flex items-center gap-4 border-t border-indigo-50 pt-2">
+                        <div class="w-28"></div>
+                        <div class="flex-1 grid grid-cols-8 gap-2">
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">1</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">2</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">3</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">4</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">5</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">6</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">7</div>
+                            <div class="beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded">8</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+        </section>
+
+    </div>
+
+    <!-- Script Logic to Bind Tone.js and Game State -->
+    <script>
+        // --- 1. Audio Engine initialization ---
+        let audioStarted = false;
+        let polySynth, lowPerc, midPerc, highPerc;
+
+        // Note mapping to vertical coordinates on staff (approx offset matching lines)
+        const noteStaffOffsets = {
+            "C4": "80%", "C#4": "80%",
+            "D4": "70%", "D#4": "70%",
+            "E4": "60%",
+            "F4": "50%", "F#4": "50%",
+            "G4": "40%", "G#4": "40%",
+            "A4": "30%", "A#4": "30%",
+            "B4": "20%",
+            "C5": "10%"
+        };
+
+        const noteSymbols = {
+            "C4": "🍎", "D4": "🦆", "E4": "🥚", "F4": "🦊",
+            "G4": "🍇", "A4": "🐜", "B4": "🐝", "C5": "🐱"
+        };
+
+        function initAudio() {
+            if (audioStarted) return;
+            
+            // Start audio context
+            Tone.start();
+            audioStarted = true;
+
+            // Simple synthesizer wave configurations
+            polySynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 }
+            }).toDestination();
+
+            // Low frequency kick drum synth
+            lowPerc = new Tone.MembraneSynth({
+                envelope: { attack: 0.01, decay: 0.4, sustain: 0.01 }
+            }).toDestination();
+
+            // Mid retro click synth
+            midPerc = new Tone.MetalSynth({
+                frequency: 200,
+                envelope: { attack: 0.001, decay: 0.05 },
+                harmonicity: 5.1,
+                resonance: 4000
+            }).toDestination();
+
+            // Blip Synth for high sequencer channel
+            highPerc = new Tone.MonoSynth({
+                oscillator: { type: "square" },
+                envelope: { attack: 0.01, decay: 0.15, sustain: 0, release: 0.1 }
+            }).toDestination();
+
+            document.getElementById('start-overlay').classList.add('opacity-0', 'pointer-events-none');
+            // Flash celebratory Hammy bubble
+            triggerDialogue("Welcome! The magic is online. Press piano keys to explore how different musical notes sound!");
+        }
+
+        // Trigger helper dialogue
+        function triggerDialogue(text) {
+            const dialogue = document.getElementById('buddy-speech');
+            dialogue.classList.add('opacity-0');
+            setTimeout(() => {
+                dialogue.textContent = text;
+                dialogue.classList.remove('opacity-0');
+            }, 150);
+        }
+
+        // Confetti burst for correct matches
+        function playConfetti() {
+            confetti({
+                particleCount: 80,
+                spread: 60,
+                origin: { y: 0.8 },
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899']
+            });
+        }
+
+        // --- 2. Tab Navigation ---
+        const tabPiano = document.getElementById('tab-piano');
+        const tabSequencer = document.getElementById('tab-sequencer');
+        const sectionPiano = document.getElementById('section-piano');
+        const sectionSequencer = document.getElementById('section-sequencer');
+
+        tabPiano.addEventListener('click', () => {
+            tabPiano.classList.add('active');
+            tabSequencer.classList.remove('active');
+            sectionPiano.classList.remove('hidden');
+            sectionSequencer.classList.add('hidden');
+            // If sequencer is playing, turn it off to prevent sound clutter
+            stopSequencer();
+        });
+
+        tabSequencer.addEventListener('click', () => {
+            tabSequencer.classList.add('active');
+            tabPiano.classList.remove('active');
+            sectionSequencer.classList.remove('hidden');
+            sectionPiano.classList.add('hidden');
+        });
+
+        // --- 3. Music Staff Drawer ---
+        const staffNoteContainer = document.getElementById('staff-note-container');
+        const staffActiveLabel = document.getElementById('staff-active-label');
+
+        function drawNoteOnStaff(note, color = 'bg-yellow-400') {
+            staffNoteContainer.innerHTML = ''; // Clear previous notes
+            
+            const offset = noteStaffOffsets[note];
+            if (!offset) return;
+
+            const noteObj = document.createElement('div');
+            noteObj.className = `absolute left-1/2 -translate-x-1/2 w-8 h-6 rounded-full ${color} border-2 border-slate-900 shadow flex items-center justify-center transition-all duration-150 animate-bounce`;
+            noteObj.style.top = offset;
+            
+            // Add emoji identifier inside note
+            if (noteSymbols[note]) {
+                const text = document.createElement('span');
+                text.className = 'text-[11px] select-none';
+                text.textContent = noteSymbols[note];
+                noteObj.appendChild(text);
+            }
+
+            // Note stem if needed
+            const stem = document.createElement('div');
+            stem.className = 'absolute w-[2px] h-10 bg-slate-900 right-0 bottom-full';
+            noteObj.appendChild(stem);
+
+            staffNoteContainer.appendChild(noteObj);
+
+            // Trigger text bubble
+            staffActiveLabel.textContent = note;
+            staffActiveLabel.classList.remove('opacity-0');
+        }
+
+        // --- 4. Piano Quest State Machine ---
+        let points = 0;
+        let level = 1;
+        let pianoMode = 'free'; // 'free' | 'game' | 'simon'
+        let targetNote = ''; // Note child needs to guess
+        let simonSequence = [];
+        let simonPlayerIndex = 0;
+
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const gameStatusBar = document.getElementById('game-status-bar');
+
+        const freePlayBtn = document.getElementById('piano-mode-free');
+        const gameModeBtn = document.getElementById('piano-mode-game');
+        const simonModeBtn = document.getElementById('piano-mode-simon');
+
+        function addPoints(amount) {
+            points += amount;
+            scoreDisplay.textContent = points;
+            if (points > 0 && points % 300 === 0) {
+                level++;
+                levelDisplay.textContent = level;
+                triggerDialogue(`Incredible! You reached Level ${level}! Keep going! 🎉`);
+                playConfetti();
+            }
+        }
+
+        // Mode Toggles
+        freePlayBtn.addEventListener('click', () => {
+            setPianoMode('free');
+        });
+        gameModeBtn.addEventListener('click', () => {
+            setPianoMode('game');
+        });
+        simonModeBtn.addEventListener('click', () => {
+            setPianoMode('simon');
+        });
+
+        function setPianoMode(mode) {
+            pianoMode = mode;
+            gameStatusBar.classList.add('hidden');
+            
+            freePlayBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 text-indigo-900 hover:bg-indigo-200 transition active:scale-95";
+            gameModeBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 text-indigo-900 hover:bg-indigo-200 transition active:scale-95";
+            simonModeBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 text-indigo-900 hover:bg-indigo-200 transition active:scale-95";
+
+            if (mode === 'free') {
+                freePlayBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition active:scale-95 border-b-2 border-indigo-800";
+                triggerDialogue("Feel free to hit any notes on the piano keyboard to make up your own melodies!");
+            } else if (mode === 'game') {
+                gameModeBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition active:scale-95 border-b-2 border-indigo-800";
+                startNoteMatchQuest();
+            } else if (mode === 'simon') {
+                simonModeBtn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition active:scale-95 border-b-2 border-indigo-800";
+                startSimonQuest();
+            }
+        }
+
+        // GAME MODE 1: Note Matching Quest
+        function startNoteMatchQuest() {
+            const keys = Object.keys(noteStaffOffsets);
+            targetNote = keys[Math.floor(Math.random() * keys.length)];
+            
+            triggerDialogue(`Can you find the matching note on the staff and play it on the keyboard? Tap carefully!`);
+            drawNoteOnStaff(targetNote, 'bg-pink-500');
+
+            gameStatusBar.className = "text-center py-2 bg-pink-100 rounded-xl font-bold text-pink-800 animate-pulse block";
+            gameStatusBar.textContent = "Find the active note on the staff board above!";
+        }
+
+        // GAME MODE 2: Memory Melodies
+        function startSimonQuest() {
+            simonSequence = [];
+            simonPlayerIndex = 0;
+            triggerDialogue("Watch the piano keys and listen! Then repeat the exact same sequence.");
+            addSimonNote();
+        }
+
+        function addSimonNote() {
+            const keys = Object.keys(noteSymbols); // Only use white keys for simpler sequence
+            const nextNote = keys[Math.floor(Math.random() * keys.length)];
+            simonSequence.push(nextNote);
+            playSimonSequence();
+        }
+
+        function playSimonSequence() {
+            let delay = 300;
+            simonPlayerIndex = 0;
+            gameStatusBar.className = "text-center py-2 bg-yellow-100 rounded-xl font-bold text-yellow-800 block";
+            gameStatusBar.textContent = "Listen closely... 🤫";
+
+            simonSequence.forEach((note, index) => {
+                setTimeout(() => {
+                    playPianoNote(note, true);
+                    if (index === simonSequence.length - 1) {
+                        setTimeout(() => {
+                            gameStatusBar.className = "text-center py-2 bg-emerald-100 rounded-xl font-bold text-emerald-800 animate-pulse block";
+                            gameStatusBar.textContent = "Your turn! Copy the pattern!";
+                        }, 500);
+                    }
+                }, delay);
+                delay += 600;
+            });
+        }
+
+        // Trigger note visually and sonically
+        function playPianoNote(note, skipCheck = false) {
+            if (!audioStarted) initAudio();
+
+            // Trigger synthesized sound
+            if (polySynth) {
+                polySynth.triggerAttackRelease(note, "8n");
+            }
+
+            // Animate Piano Key
+            const keyElement = document.querySelector(`[data-note="${note}"]`);
+            if (keyElement) {
+                keyElement.classList.add('active');
+                setTimeout(() => keyElement.classList.remove('active'), 250);
+            }
+
+            // Draw note on staff
+            drawNoteOnStaff(note, 'bg-emerald-400');
+
+            // Skip checking logic if triggered by code (like Simon preview)
+            if (skipCheck) return;
+
+            // Handle current Game Mode logic
+            if (pianoMode === 'game') {
+                if (note === targetNote) {
+                    addPoints(100);
+                    triggerDialogue("Spot on! That's correct. Let's try another one!");
+                    playConfetti();
+                    setTimeout(startNoteMatchQuest, 1200);
+                } else {
+                    triggerDialogue("Oh, close! Look closely at the vertical position on the staff and try again.");
+                }
+            } else if (pianoMode === 'simon') {
+                if (note === simonSequence[simonPlayerIndex]) {
+                    simonPlayerIndex++;
+                    if (simonPlayerIndex === simonSequence.length) {
+                        // Success sequence
+                        addPoints(150);
+                        triggerDialogue("Wow, amazing memory! Let's make it one note longer!");
+                        playConfetti();
+                        setTimeout(addSimonNote, 1200);
+                    }
+                } else {
+                    // Failed sequence
+                    triggerDialogue("Oops, a wrong note broke the loop! Let's start a new sequence.");
+                    gameStatusBar.className = "text-center py-2 bg-red-100 rounded-xl font-bold text-red-800 block";
+                    gameStatusBar.textContent = "Game Over! Starting fresh sequence...";
+                    setTimeout(startSimonQuest, 1500);
+                }
+            }
+        }
+
+        // Bind physical button clicks/taps for piano keys
+        document.querySelectorAll('[data-note]').forEach(key => {
+            key.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const note = key.getAttribute('data-note');
+                playPianoNote(note);
+            });
+
+            key.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const note = key.getAttribute('data-note');
+                playPianoNote(note);
+            });
+        });
+
+        // Waveform selector update
+        const synthWaveform = document.getElementById('synth-waveform');
+        synthWaveform.addEventListener('change', (e) => {
+            const wave = e.target.value;
+            if (polySynth) {
+                polySynth.set({
+                    oscillator: { type: wave }
+                });
+            }
+        });
+
+
+        // --- 5. Beat Builder Sequencer Logic ---
+        const playBtn = document.getElementById('seq-play-btn');
+        const clearBtn = document.getElementById('seq-clear-btn');
+        const tempoSlider = document.getElementById('seq-tempo');
+        const tempoVal = document.getElementById('tempo-val');
+
+        const rows = {
+            low: document.getElementById('grid-row-low'),
+            mid: document.getElementById('grid-row-mid'),
+            high: document.getElementById('grid-row-high')
+        };
+
+        const sequenceData = {
+            low: Array(8).fill(false),
+            mid: Array(8).fill(false),
+            high: Array(8).fill(false)
+        };
+
+        // Presets configuration
+        const soundPresets = {
+            space: { lowFreq: "C2", midFreq: "G4", highFreq: "C5" },
+            retro: { lowFreq: "E1", midFreq: "E3", highFreq: "B5" },
+            dreamy: { lowFreq: "A1", midFreq: "E4", highFreq: "A5" }
+        };
+        let activePreset = "space";
+
+        // Generate grid cells dynamically
+        function createGrid() {
+            Object.keys(rows).forEach(rowKey => {
+                const container = rows[rowKey];
+                container.innerHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const cell = document.createElement('button');
+                    cell.className = 'h-14 rounded-xl border-2 border-slate-200 transition-all focus:outline-none flex items-center justify-center [&.active]:bg-indigo-600 [&.active]:border-indigo-800 bg-white hover:bg-slate-50';
+                    cell.dataset.index = i;
+                    
+                    // Cute internal toggle indicator
+                    const dot = document.createElement('div');
+                    dot.className = 'w-4 h-4 rounded-full bg-slate-200 pointer-events-none transition-all';
+                    cell.appendChild(dot);
+
+                    cell.addEventListener('click', () => {
+                        if (!audioStarted) initAudio();
+                        sequenceData[rowKey][i] = !sequenceData[rowKey][i];
+                        cell.classList.toggle('active', sequenceData[rowKey][i]);
+                        
+                        const activeDot = cell.querySelector('div');
+                        if (sequenceData[rowKey][i]) {
+                            activeDot.className = 'w-5 h-5 rounded-full bg-white scale-110';
+                        } else {
+                            activeDot.className = 'w-4 h-4 rounded-full bg-slate-200';
+                        }
+                    });
+                    container.appendChild(cell);
+                }
+            });
+        }
+
+        createGrid();
+
+        // Loop execution variables
+        let loopId = null;
+        let isSequencerPlaying = false;
+        let beatCounter = 0;
+
+        function startSequencer() {
+            if (isSequencerPlaying) return;
+            
+            if (!audioStarted) initAudio();
+            
+            isSequencerPlaying = true;
+            playBtn.innerHTML = `<i class="fa-solid fa-circle-stop"></i> Stop Loop`;
+            playBtn.className = "bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-extrabold text-lg flex items-center gap-2 shadow transition-all active:scale-95";
+
+            // Loop schedule
+            loopId = Tone.Transport.scheduleRepeat((time) => {
+                const step = beatCounter % 8;
+
+                // Toggle visual sequence indicators
+                const indicators = document.querySelectorAll('.beat-indicator');
+                indicators.forEach((ind, index) => {
+                    if (index === step) {
+                        ind.className = 'beat-indicator text-center font-bold text-indigo-600 text-xs py-1 rounded bg-indigo-100 scale-110 shadow-sm';
+                    } else {
+                        ind.className = 'beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded';
+                    }
+                });
+
+                // Play synth triggers
+                const preset = soundPresets[activePreset];
+
+                if (sequenceData.low[step]) {
+                    lowPerc.triggerAttackRelease(preset.lowFreq, "8n", time);
+                }
+                if (sequenceData.mid[step]) {
+                    midPerc.triggerAttackRelease(time);
+                }
+                if (sequenceData.high[step]) {
+                    highPerc.triggerAttackRelease(preset.highFreq, "16n", time);
+                }
+
+                beatCounter++;
+            }, "8n");
+
+            Tone.Transport.start();
+        }
+
+        function stopSequencer() {
+            if (!isSequencerPlaying) return;
+            isSequencerPlaying = false;
+            
+            playBtn.innerHTML = `<i class="fa-solid fa-circle-play"></i> Play Loop`;
+            playBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-extrabold text-lg flex items-center gap-2 shadow transition-all active:scale-95";
+
+            Tone.Transport.stop();
+            if (loopId !== null) {
+                Tone.Transport.clear(loopId);
+                loopId = null;
+            }
+            beatCounter = 0;
+
+            // Clear visual counters
+            const indicators = document.querySelectorAll('.beat-indicator');
+            indicators.forEach((ind, index) => {
+                ind.className = 'beat-indicator text-center font-bold text-slate-400 text-xs py-1 rounded';
+            });
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (isSequencerPlaying) {
+                stopSequencer();
+            } else {
+                startSequencer();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            Object.keys(sequenceData).forEach(key => {
+                sequenceData[key].fill(false);
+            });
+            createGrid();
+        });
+
+        // Tempo slider binder
+        tempoSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            tempoVal.textContent = `${val} BPM`;
+            Tone.Transport.bpm.value = val;
+        });
+
+        // Presets buttons binder
+        const presetBtns = document.querySelectorAll('.synth-preset-btn');
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetBtns.forEach(b => b.className = "synth-preset-btn px-3 py-2 rounded-xl text-xs font-bold bg-white text-indigo-900 hover:bg-indigo-50 border border-indigo-200");
+                btn.className = "synth-preset-btn active px-3 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm border-b-2 border-indigo-800";
+                activePreset = btn.getAttribute('data-preset');
+            });
+        });
+
+        // Setup starting trigger for audio overlay
+        const startOverlay = document.getElementById('start-overlay');
+        const startAudioBtn = document.getElementById('start-audio-btn');
+
+        startAudioBtn.addEventListener('click', () => {
+            initAudio();
+        });
+
+        // Handle help modal toggles
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeHelpBtn = document.getElementById('close-help-btn');
+
+        helpBtn.addEventListener('click', () => {
+            helpModal.classList.remove('hidden');
+        });
+
+        closeHelpBtn.addEventListener('click', () => {
+            helpModal.classList.add('hidden');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
 </html>
